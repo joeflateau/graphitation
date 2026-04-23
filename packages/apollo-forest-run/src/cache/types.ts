@@ -195,6 +195,19 @@ export type ForestRunAdditionalConfig<
   historyConfig?: HistoryConfig<TPartitions>;
 };
 
+export type ForestRunPartitionStats = {
+  operationCount: number;
+  maxOperationCount: number | null;
+  autoEvict: boolean;
+};
+
+export type ForestRunStats = {
+  docCount: number;
+  treeCount: number;
+  nodeCount: number;
+  partitions: Record<string, ForestRunPartitionStats>;
+};
+
 export type CacheConfig<TPartitions extends HistoryPartitions = any> =
   InMemoryCacheConfig & ForestRunAdditionalConfig<TPartitions>;
 

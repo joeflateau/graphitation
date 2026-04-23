@@ -11,6 +11,8 @@ import type {
   CacheConfig,
   CacheEnv,
   DataForest,
+  ForestRunPartitionStats,
+  ForestRunStats,
   HistoryPartitions,
   OptimisticLayer,
   SerializedCache,
@@ -456,10 +458,27 @@ export class ForestRun<
     return evictOldData(this.env, this.store).map(String);
   }
 
-  public getStats() {
+  public getStats(): ForestRunStats {
+    const partitions: Record<string, ForestRunPartitionStats> = {};
+    const configuredPartitions = this.env.partitionConfig.partitions;
+
+    for (const [
+      name,
+      ops,
+    ] of this.store.dataForest.operationsByPartitions) {
+      const config = configuredPartitions[name];
+      partitions[name] = {
+        operationCount: ops.size,
+        maxOperationCount: config?.maxOperationCount ?? null,
+        autoEvict: config?.autoEvict ?? false,
+      };
+    }
+
     return {
       docCount: this.store.operations.size,
       treeCount: this.store.dataForest.trees.size,
+      nodeCount: this.store.dataForest.operationsByNodes.size,
+      partitions,
     };
   }
 
